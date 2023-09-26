@@ -4,10 +4,6 @@ Placing your music taste on the map.
 
 [Try demo version](https://melomap.vercel.app) (currently awaiting Spotify API approval)
 
-<!-- gif -->
-
-![app demo](.github/demo.gif)
-
 ## About
 
 Melomap is fully interactive visual explorer of your favorite and soon-to-be favorite artists. All data is fetched and processed locally, so no worries about your privacy.
