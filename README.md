@@ -4,7 +4,7 @@ Placing your music taste on the map.
 
 [Try demo version](https://melomap.vercel.app) (currently awaiting Spotify API approval)
 
-![Demo video](https://github.com/0xroko/melomap/blob/2d96f2837efc77b8b75cf46c1766f277f741b7f5/.github/demo.mp4)
+https://github.com/0xroko/melomap/assets/55251261/40d1dac3-2732-4002-b2f0-ad9640988af0
 
 ## About
 
