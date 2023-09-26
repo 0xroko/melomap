@@ -1,4 +1,4 @@
-import { ARTIST_DATA_KEY } from "@/lib/const";
+import { ARTIST_DATA_KEY, ARTIST_DATA_SET_TIME_KEY } from "@/lib/const";
 import { map } from "@/lib/map";
 import { fetchArtistData } from "@/lib/spotify";
 import {
@@ -8,7 +8,7 @@ import {
   ExtendedGraphData,
 } from "@/lib/types";
 import { MotionValue } from "framer-motion";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -142,6 +142,7 @@ const getCachedArtistData = () => {
 
 const setArtistData = async (artistData: ArtistData) => {
   localStorage.setItem(ARTIST_DATA_KEY, JSON.stringify(artistData));
+  localStorage.setItem(ARTIST_DATA_SET_TIME_KEY, Date.now().toString());
 };
 
 const fetchAndBuild = async () => {
@@ -175,6 +176,7 @@ interface AppStateStore {
   refetch: () => void;
   initFinished: boolean;
   graph?: ExtendedGraphData;
+  logout: () => void;
 }
 
 export const useAppState = create<AppStateStore>((set, get) => ({
@@ -186,7 +188,14 @@ export const useAppState = create<AppStateStore>((set, get) => ({
   // since it's only used for the progress bar, we can use a motion value to avoid re-renders
   fetchProgress: new MotionValue(),
   initFinished: false,
+  logout: () => {
+    localStorage.removeItem(ARTIST_DATA_KEY);
+    localStorage.removeItem(ARTIST_DATA_SET_TIME_KEY);
+    set({ graphState: "NOT_BUILD", graph: undefined });
+    signOut({ redirect: true, callbackUrl: "/" });
+  },
   refetch: async () => {
+    localStorage.removeItem(ARTIST_DATA_KEY);
     set({ graphState: "DONE", graph: undefined });
     const graph = await fetchAndBuild();
     set({ graphState: "DONE", graph });

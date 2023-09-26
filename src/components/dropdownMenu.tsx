@@ -1,7 +1,8 @@
 import { Pannel } from "@/components";
+import { useCanRefetchArtistData } from "@/hooks/useCanRefetchArtistData";
 import { useAppSettings, useAppState } from "@/lib/store";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 interface MenuItemProps extends DropdownMenu.MenuCheckboxItemProps {
   children?: React.ReactNode | React.ReactNode[];
@@ -53,9 +54,13 @@ interface MenuProps {
 export const Menu = ({ children }: MenuProps) => {
   const appSettings = useAppSettings();
   const refetch = useAppState((state) => state.refetch);
+  const logout = useAppState((state) => state.logout);
+
   const session = useSession();
 
   const isLoggedin = !!session.data?.user;
+
+  const canRefetch = useCanRefetchArtistData() && isLoggedin;
 
   return (
     <DropdownMenu.Root>
@@ -98,28 +103,22 @@ export const Menu = ({ children }: MenuProps) => {
           >
             Show Spotify artist info
           </MenuCheckboxItem>
-          {/* <DropdownMenu.Separator className="m-[5px] h-[1px] bg-neutral-800" /> */}
+          <DropdownMenu.Separator className="m-[5px] h-[1px] bg-neutral-800" />
 
-          {/* <MenuItem
-            onClick={() => {
-              refresh();
-            }}
-          >
-            Reanimate
-          </MenuItem> */}
-          {/* <MenuItem
+          <MenuItem
+            disabled={!canRefetch}
             onClick={() => {
               refetch();
             }}
           >
-            Refetch
-          </MenuItem> */}
+            Update
+          </MenuItem>
 
           <DropdownMenu.Separator className="m-[5px] h-[1px] bg-neutral-800" />
           <MenuItem
             disabled={!isLoggedin}
             onSelect={() => {
-              signOut({ redirect: true, callbackUrl: "/" });
+              logout();
             }}
           >
             Logout

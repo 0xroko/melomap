@@ -14,6 +14,7 @@ export const colors = {
 };
 
 export const ARTIST_DATA_KEY = "artist-data";
+export const ARTIST_DATA_SET_TIME_KEY = "artist-data-set-time";
 
 export const demoDataPath = "/demo-artist-data.json" as const;
 
