@@ -69,6 +69,31 @@ export const spotifyFetch = async (
   return json;
 };
 
+const progressTracker = (onIncrement: (progress: number) => void) => {
+  let doneCount = 0;
+  let total = 1;
+
+  return {
+    setTotal: (t: number) => {
+      total = t;
+    },
+    reset: () => {
+      doneCount = 0;
+      total = 1;
+      onIncrement(0);
+    },
+    updateTotal: (t: number) => {
+      total += t;
+    },
+    increment: () => {
+      doneCount++;
+      const progress = doneCount / total;
+      onIncrement(progress);
+      return progress;
+    },
+  };
+};
+
 export const fetchArtistData = async ({ session }: { session: Session }) => {
   const artists = new Map<string, Artist>();
   const artistsRelations: Array<ArtistRelation> = [];
@@ -76,19 +101,25 @@ export const fetchArtistData = async ({ session }: { session: Session }) => {
   const playlistsSongs: Song[] = [];
   const fetchPromiseLimiter = pLimit(7);
 
-  let doneCount = 0,
-    total = 1;
-
-  useAppState.setState({ graphState: "FETCHING_PLAYLISTS" });
+  const fetchProgressTracker = progressTracker((progress) => {
+    useAppState.getState().fetchProgress.set(progress);
+  });
 
   const userSavedTracksCount =
     (await spotifyFetch(`/me/tracks?limit=1`, session.user.accessToken!))
       ?.total ?? 0;
 
+  const userSavedTracksReqestCount = Math.ceil(
+    userSavedTracksCount / TRACK_LIMIT,
+  );
+
+  useAppState.setState({ graphState: "FETCHING_USER_SAVED_TRACKS" });
+  fetchProgressTracker.setTotal(userSavedTracksReqestCount);
+
   let artistsFromUserLimitReached = false;
 
   // get all songs from user saved tracks
-  for (let i = 0; i < Math.ceil(userSavedTracksCount! / TRACK_LIMIT); i++) {
+  for (let i = 0; i < userSavedTracksReqestCount; i++) {
     const userSavedTracksReq = (await spotifyFetch(
       `/me/tracks?limit=${TRACK_LIMIT}&offset=${i * TRACK_LIMIT}`,
       session.user.accessToken!,
@@ -96,6 +127,8 @@ export const fetchArtistData = async ({ session }: { session: Session }) => {
 
     const tracks = userSavedTracksReq?.items.map((t) => t.track);
     if (!tracks) continue;
+
+    fetchProgressTracker.increment();
 
     playlistsSongs.push(...tracks);
     tracks?.forEach((song, i) => {
@@ -113,7 +146,6 @@ export const fetchArtistData = async ({ session }: { session: Session }) => {
 
       if (artistsFromUserLimitReached) return;
     });
-
     if (artistsFromUserLimitReached) break;
   }
 
@@ -122,6 +154,15 @@ export const fetchArtistData = async ({ session }: { session: Session }) => {
     `/me/playlists?limit=${TRACK_LIMIT}&offset=0`,
     session.user.accessToken!,
   )) as PlaylistsApiResponse;
+
+  const totalRequestCount = playlistsReq?.items?.reduce(
+    (a, b) => a + b.tracks.total / TRACK_LIMIT,
+    0,
+  );
+
+  useAppState.setState({ graphState: "FETCHING_PLAYLISTS" });
+  fetchProgressTracker.reset();
+  fetchProgressTracker.setTotal(totalRequestCount);
 
   // sort the playlists by number of tracks -> more likely to have relevant artists
   playlistsReq.items.sort((a, b) => b.tracks.total - a.tracks.total);
@@ -150,6 +191,8 @@ export const fetchArtistData = async ({ session }: { session: Session }) => {
       const tracks = playlistItems?.items.map((t) => t.track);
 
       if (!tracks) continue;
+
+      fetchProgressTracker.increment();
 
       playlistsSongs.push(...tracks);
       tracks?.forEach((song, i) => {
@@ -239,13 +282,13 @@ export const fetchArtistData = async ({ session }: { session: Session }) => {
         });
       }
 
-      useAppState.getState().fetchProgress.set(doneCount++ / total);
+      fetchProgressTracker.increment();
     });
   });
 
   useAppState.setState({ graphState: "FETCHING_RELATED_ARTISTS" });
-  total = relatedArtistsPromises.length;
-  doneCount = 0;
+  fetchProgressTracker.reset();
+  fetchProgressTracker.setTotal(relatedArtistsPromises.length);
 
   await Promise.all(relatedArtistsPromises);
 

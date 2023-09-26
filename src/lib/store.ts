@@ -163,7 +163,7 @@ interface AppStateStore {
     | "BUILDING"
     | "FETCHING_RELATED_ARTISTS"
     | "FETCHING_PLAYLISTS"
-    | "FETCHING_TOP_ARTISTS"
+    | "FETCHING_USER_SAVED_TRACKS"
     | "DONE"
     | "NOT_BUILD"
     | "UNKNOWN";

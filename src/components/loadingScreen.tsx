@@ -65,7 +65,10 @@ export const LoadingScreen = ({ children }: LoadingScreenProps) => {
   const state = useAppState((state) => state.graphState);
   const progress = useAppState((state) => state.fetchProgress);
 
-  const showBar = state === "FETCHING_RELATED_ARTISTS";
+  const showBar =
+    state === "FETCHING_RELATED_ARTISTS" ||
+    state === "FETCHING_USER_SAVED_TRACKS" ||
+    state === "FETCHING_PLAYLISTS";
 
   let message = "";
   switch (state) {
@@ -74,6 +77,9 @@ export const LoadingScreen = ({ children }: LoadingScreenProps) => {
       break;
     case "FETCHING_PLAYLISTS":
       message = "Fetching playlists";
+      break;
+    case "FETCHING_USER_SAVED_TRACKS":
+      message = "Fetching saved tracks";
       break;
     case "BUILDING":
       message =
@@ -96,8 +102,10 @@ export const LoadingScreen = ({ children }: LoadingScreenProps) => {
       />
 
       <div
-        className={`fixed bottom-2 mt-2 text-sm font-medium text-neutral-400`}
+        className={`fixed bottom-2 mt-2 text-center text-sm font-medium text-neutral-400`}
       >
+        {showBar && "Don't close this tab"}
+        <br />
         For best viewing experience, please use a desktop browser
       </div>
     </div>
