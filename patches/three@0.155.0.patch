@@ -1,0 +1,66 @@
+diff --git a/build/three.module.js b/build/three.module.js
+index 0d1af007971cdc211b60e6bc4fa913d838a39174..204abe70fe8b1fcbef81b49449ae644a0bdb1dd4 100644
+--- a/build/three.module.js
++++ b/build/three.module.js
+@@ -7084,8 +7084,8 @@ class Layers {
+ 	}
+ 
+ 	test( layers ) {
+-
+-		return ( this.mask & layers.mask ) !== 0;
++		return true;
++		//return ( this.mask & layers.mask ) !== 0;
+ 
+ 	}
+ 
+@@ -29176,7 +29176,7 @@ class WebGLRenderer {
+ 
+ 			if ( object.visible === false ) return;
+ 
+-			const visible = object.layers.test( camera.layers );
++			const visible = true;// object.layers.test( camera.layers );
+ 
+ 			if ( visible ) {
+ 
+@@ -29247,28 +29247,8 @@ class WebGLRenderer {
+ 
+ 						}
+ 
+-						if ( Array.isArray( material ) ) {
+-
+-							const groups = geometry.groups;
+-
+-							for ( let i = 0, l = groups.length; i < l; i ++ ) {
+-
+-								const group = groups[ i ];
+-								const groupMaterial = material[ group.materialIndex ];
+-
+-								if ( groupMaterial && groupMaterial.visible ) {
+-
+-									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector3.z, group );
+-
+-								}
+-
+-							}
+-
+-						} else if ( material.visible ) {
+-
+ 							currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+ 
+-						}
+ 
+ 					}
+ 
+diff --git a/examples/jsm/renderers/CSS2DRenderer.js b/examples/jsm/renderers/CSS2DRenderer.js
+index 6d67931b97ff4447950a8b69ab915459981e4eee..9921294f364f511d5756a7529ea4e10967165ebf 100644
+--- a/examples/jsm/renderers/CSS2DRenderer.js
++++ b/examples/jsm/renderers/CSS2DRenderer.js
+@@ -97,7 +97,7 @@ class CSS2DRenderer {
+ 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
+ 
+ 			renderObject( scene, scene, camera );
+-			zOrder( scene );
++			//zOrder( scene );
+ 
+ 		};
+ 

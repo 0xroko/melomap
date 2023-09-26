@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #090909;
+  font-family: -apple-system, BlinkMacSystemFont, var(--font-inter);
+}
+
+#__next {
+  width: 100%;
+  min-height: 100svh;
+}
+
+.graph-tooltip {
+  pointer-events: none;
+}
+
+.scene-nav-info {
+  display: none !important;
+}
+
+.graph-text {
+  color: white;
+  will-change: transform, opacity;
+  font-family: -apple-system, BlinkMacSystemFont, var(--font-inter);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.384);
+}
+
+.graph-text-selcted {
+  z-index: 99999;
+  background-color: #080808;
+  padding-left: 10px;
+  border-radius: 10%;
+  padding-right: 10px;
+}
+
+/* last child should have pointer events auto */
+.scene-container div:last-child {
+  pointer-events: unset !important;
+}
+
+.mask-image {
+  mask-image: var(--mask-image);
+}

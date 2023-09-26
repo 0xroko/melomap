@@ -1,0 +1,71 @@
+diff --git a/dist/three-render-objects.mjs b/dist/three-render-objects.mjs
+index 53322822667aef668a65057fa13cfc1b57e93745..df4dbb3fa1e5119013fffa5b63ed0b54d7dd175d 100644
+--- a/dist/three-render-objects.mjs
++++ b/dist/three-render-objects.mjs
+@@ -1,4 +1,4 @@
+-import { WebGLRenderer, Scene, PerspectiveCamera, Raycaster, SRGBColorSpace, TextureLoader, Vector2, Vector3, Box3, Color, Mesh, SphereGeometry, MeshBasicMaterial, BackSide, EventDispatcher, MOUSE, Quaternion, Spherical, Clock } from 'three';
++import { WebGLRenderer, Scene, PerspectiveCamera, Raycaster, SRGBColorSpace, TextureLoader, Vector2, Vector3, Box3, Color, Mesh, SphereGeometry, MeshBasicMaterial, BackSide, EventDispatcher, MOUSE, Quaternion, Spherical, Clock, OrthographicCamera } from 'three';
+ import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
+ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+ import { FlyControls } from 'three/examples/jsm/controls/FlyControls.js';
+@@ -130,6 +130,7 @@ function _toPropertyKey(arg) {
+ var three = window.THREE ? window.THREE // Prefer consumption from global THREE, if exists
+ : {
+   WebGLRenderer: WebGLRenderer,
++OrthographicCamera:OrthographicCamera,
+   Scene: Scene,
+   PerspectiveCamera: PerspectiveCamera,
+   Raycaster: Raycaster,
+@@ -230,13 +231,13 @@ var threeRenderObjects = Kapsule({
+   methods: {
+     tick: function tick(state) {
+       if (state.initialised) {
+-        state.controls.update && state.controls.update(state.clock.getDelta()); // timedelta is required for fly controls
++    //    state.controls.update && state.controls.update(state.clock.getDelta()); // timedelta is required for fly controls
+ 
+-        state.postProcessingComposer ? state.postProcessingComposer.render() // if using postprocessing, switch the output to it
+-        : state.renderer.render(state.scene, state.camera);
+-        state.extraRenderers.forEach(function (r) {
+-          return r.render(state.scene, state.camera);
+-        });
++     //   state.postProcessingComposer ? state.postProcessingComposer.render() // if using postprocessing, switch the output to it
++      //  : state.renderer.render(state.scene, state.camera);
++       // state.extraRenderers.forEach(function (r) {
++        //  return r.render(state.scene, state.camera);
++        //});
+         if (state.enablePointerInteraction) {
+           // Update tooltip and trigger onHover events
+           var topObject = null;
+@@ -421,9 +422,13 @@ var threeRenderObjects = Kapsule({
+   },
+ 
+   stateInit: function stateInit() {
++	    const aspect = (window?.innerWidth ?? 1) / (window?.innerHeight ?? 1); 
++    //console.log(aspect);
++    const frustumSize = 1;
++
+     return {
+       scene: new three.Scene(),
+-      camera: new three.PerspectiveCamera(),
++      camera: new three.OrthographicCamera( frustumSize * aspect * -1, frustumSize * aspect , frustumSize, frustumSize * -1, 0.0001, 1000000),
+       clock: new three.Clock()
+     };
+   },
+@@ -559,7 +564,7 @@ var threeRenderObjects = Kapsule({
+       trackball: TrackballControls,
+       orbit: OrbitControls,
+       fly: FlyControls
+-    }[controlType](state.camera, state.renderer.domElement);
++    }[controlType](state.camera, state.container);
+     if (controlType === 'fly') {
+       state.controls.movementSpeed = 300;
+       state.controls.rollSpeed = Math.PI / 6;
+@@ -607,7 +612,7 @@ var threeRenderObjects = Kapsule({
+     }
+     if (changedProps.hasOwnProperty('skyRadius') && state.skyRadius) {
+       state.controls.hasOwnProperty('maxDistance') && changedProps.skyRadius && (state.controls.maxDistance = Math.min(state.controls.maxDistance, state.skyRadius));
+-      state.camera.far = state.skyRadius * 2.5;
++// state.camera.far = state.skyRadius * 2.5;
+       state.camera.updateProjectionMatrix();
+       state.skysphere.geometry = new three.SphereGeometry(state.skyRadius);
+     }
