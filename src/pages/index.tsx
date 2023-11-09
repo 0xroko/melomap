@@ -1,5 +1,6 @@
 import { Card } from "@/components/homeCard";
 import { ScrollIndicator } from "@/components/scrollIndicator";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 
 interface HomePageProps {}
@@ -51,20 +52,18 @@ const HomePage = ({}: HomePageProps) => {
             placing your music taste on the map
           </div>
           <div className="mt-10 inline-flex items-start justify-start gap-3.5">
-            <Link
-              href={"/sorry"}
-              //
-              // onClick={() => {
-              //   signIn("spotify", {
-              //     callbackUrl: "/graph",
-              //   });
-              // }}
+            <button
+              onClick={() => {
+                signIn("spotify", {
+                  callbackUrl: "/graph",
+                });
+              }}
               className="flex items-center justify-center rounded-xl border border-green-600 bg-neutral-950 bg-opacity-60 px-4  py-2 text-white"
             >
               <div className="text-sm font-semibold text-green-600">
                 Continue with Spoitfy
               </div>
-            </Link>
+            </button>
             <Link
               href={"/demo"}
               className="flex items-center justify-center rounded-xl bg-white px-4 py-2 text-neutral-900 backdrop-blur-md duration-300 hover:opacity-60"

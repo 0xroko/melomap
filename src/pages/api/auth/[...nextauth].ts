@@ -4,7 +4,7 @@ import SpotifyProvider, { SpotifyProfile } from "next-auth/providers/spotify";
 const SCOPES = [
   "user-library-read",
   "playlist-read-private",
-  "user-follow-read",
+  // "user-follow-read",
   "user-top-read",
   "user-read-recently-played",
 ];
